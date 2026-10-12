@@ -1,7 +1,7 @@
 # Zero Work AI — download page
 
 Public landing page that sends people to the app stores:
-https://ai-agents-for-sale.github.io/download/
+https://app.zerowork-media.com/
 
 - App Store: https://apps.apple.com/il/app/id6799529635 (keep `/il/`)
 - Google Play: https://play.google.com/store/apps/details?id=com.zeroworkai.app
