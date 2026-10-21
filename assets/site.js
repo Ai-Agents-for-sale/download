@@ -1,109 +1,128 @@
-// Zero Work AI — mini-site behaviour. Two small jobs, no cookies, no tracking.
+// Zero Work AI — mini-site behaviour. No cookies, no tracking. The head script has already set
+// html.js plus html.motion or html.motion-none before first paint.
 (function () {
-  // 1. The store that matches the visitor's phone goes first.
+  var html = document.documentElement;
+  var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var motionOn = function () { return html.classList.contains("motion") && !html.classList.contains("motion-paused"); };
+  var svgs = function () { return document.querySelectorAll("svg.smil"); };
+
+  // ── 1. motion on/off (WCAG 2.2.2: every ambient loop can be stopped) ──
+  function setMotion(on, save) {
+    html.classList.toggle("motion-paused", !on && html.classList.contains("motion"));
+    if (on) { html.classList.remove("motion-none", "motion-paused"); html.classList.add("motion"); }
+    svgs().forEach(function (s) { try { on ? s.unpauseAnimations() : s.pauseAnimations(); } catch (e) {} });
+    document.querySelectorAll(".motion-toggle").forEach(function (b) {
+      b.setAttribute("aria-pressed", on ? "false" : "true");
+      var l = b.querySelector(".label"); if (l) l.textContent = on ? "עצירת תנועה" : "הפעלת תנועה";
+      b.setAttribute("aria-label", on ? "עצירת תנועה ואנימציות באתר" : "הפעלת תנועה ואנימציות באתר");
+    });
+    if (save) { try { localStorage.setItem("zw-motion", on ? "on" : "off"); } catch (e) {} }
+  }
+  if (!html.classList.contains("motion")) {
+    svgs().forEach(function (s) { try { s.pauseAnimations(); s.setCurrentTime(0); } catch (e) {} });
+    setMotion(false, false);
+  } else { setMotion(true, false); }
+  document.querySelectorAll(".motion-toggle").forEach(function (b) {
+    b.addEventListener("click", function () { setMotion(!motionOn(), true); });
+  });
+  if (reduce) document.querySelectorAll(".motion-toggle").forEach(function (b) { b.hidden = false; });
+
+  // ── 2. header glass after scrolling ──
+  var header = document.querySelector(".site-header");
+  var onScroll = function () { if (header) header.classList.toggle("scrolled", window.scrollY > 8); };
+  window.addEventListener("scroll", onScroll, { passive: true }); onScroll();
+
+  // ── 3. scroll reveals + count-up ──
+  var revealAll = function () { document.querySelectorAll(".rv").forEach(function (el) { el.classList.add("in"); }); };
+  function countUp(el) {
+    var to = parseInt(el.getAttribute("data-to"), 10), suffix = el.getAttribute("data-suffix") || "";
+    if (!to || !motionOn()) return;
+    var t0 = null, dur = 1300;
+    function step(t) { if (!t0) t0 = t; var k = Math.min(1, (t - t0) / dur); var e = 1 - Math.pow(1 - k, 3);
+      el.textContent = Math.round(to * e) + (k === 1 ? suffix : ""); if (k < 1) requestAnimationFrame(step); }
+    el.textContent = "0"; requestAnimationFrame(step);
+  }
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        en.target.classList.add("in");
+        en.target.querySelectorAll("[data-to]").forEach(countUp);
+        io.unobserve(en.target);
+      });
+    }, { threshold: 0.14, rootMargin: "0px 0px -6% 0px" });
+    document.querySelectorAll(".rv").forEach(function (el) { io.observe(el); });
+
+    // ── 4. the phone follows the step in the middle of the screen ──
+    var phone = document.querySelector(".story .phone");
+    var steps = document.querySelectorAll(".story-step");
+    if (phone && steps.length) {
+      var so = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (!en.isIntersecting) return;
+          steps.forEach(function (s) { s.classList.toggle("on", s === en.target); });
+          phone.setAttribute("data-step", en.target.getAttribute("data-step"));
+        });
+      }, { rootMargin: "-45% 0px -45% 0px" });
+      steps.forEach(function (s) { so.observe(s); });
+    }
+  } else { revealAll(); document.querySelectorAll(".story-step").forEach(function (s) { s.classList.add("on"); }); }
+
+  // ── 5. light that follows the pointer on feature tiles ──
+  document.querySelectorAll(".tile").forEach(function (t) {
+    t.addEventListener("pointermove", function (ev) {
+      var r = t.getBoundingClientRect();
+      t.style.setProperty("--mx", (ev.clientX - r.left) + "px");
+      t.style.setProperty("--my", (ev.clientY - r.top) + "px");
+    });
+  });
+
+  // ── 6. the store that matches the visitor's phone goes first ──
   try {
-    var ua = navigator.userAgent || "";
-    var android = /Android/i.test(ua);
-    var ios = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-    if (android) {
-      document.querySelectorAll(".stores").forEach(function (box) {
-        var gp = box.querySelector("[data-store='android']");
-        if (gp) box.insertBefore(gp, box.firstChild);
+    if (/Android/i.test(navigator.userAgent || "")) {
+      document.querySelectorAll(".stores, .foot-stores").forEach(function (box) {
+        var gp = box.querySelector("[data-store='android']"); if (gp) box.insertBefore(gp, box.firstChild);
       });
     }
-    void ios;
   } catch (e) {}
 
-  // 2. The lead form → site-lead edge function → Monday leads board.
+  // ── 7. the lead form → site-lead edge function → Monday leads board ──
   var ENDPOINT = "https://jjbxsivcjhpuobpohpoz.supabase.co/functions/v1/site-lead";
   // Public anon key — the same one shipped inside the app; not a secret.
   var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqYnhzaXZjamhwdW9icG9ocG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxMTYzNTUsImV4cCI6MjA5NzY5MjM1NX0.CRtQPXuDTiG8LhSiBiv8zpFh-Pi6rboN7AiBGppKPfA";
   var started = Date.now();
-
   function israeliPhone(raw) {
     var d = String(raw || "").replace(/\D/g, "");
-    if (d.indexOf("00972") === 0) d = d.slice(5);
-    else if (d.indexOf("972") === 0) d = d.slice(3);
+    if (d.indexOf("00972") === 0) d = d.slice(5); else if (d.indexOf("972") === 0) d = d.slice(3);
     if (d.charAt(0) !== "0") d = "0" + d;
     return /^0(5\d{8}|7\d{8}|[2-4689]\d{7})$/.test(d) ? d : "";
   }
-
   function setError(form, name, msg) {
-    var input = form.querySelector("[name='" + name + "']");
-    var err = form.querySelector("#" + form.id + "-" + name + "-error");
+    var input = form.querySelector("[name='" + name + "']"), err = form.querySelector("#" + form.id + "-" + name + "-error");
     if (!input || !err) return;
-    if (msg) {
-      input.setAttribute("aria-invalid", "true");
-      err.textContent = msg;
-      err.hidden = false;
-    } else {
-      input.removeAttribute("aria-invalid");
-      err.textContent = "";
-      err.hidden = true;
-    }
+    if (msg) { input.setAttribute("aria-invalid", "true"); err.textContent = msg; err.hidden = false; }
+    else { input.removeAttribute("aria-invalid"); err.textContent = ""; err.hidden = true; }
   }
-
   document.querySelectorAll("form.lead-form").forEach(function (form) {
-    var status = form.querySelector(".form-status");
-    var button = form.querySelector("button[type='submit']");
-
+    var status = form.querySelector(".form-status"), button = form.querySelector("button[type='submit']");
     form.addEventListener("submit", function (ev) {
       ev.preventDefault();
-      var name = form.elements.name.value.trim();
-      var phoneRaw = form.elements.phone.value.trim();
-      var phone = israeliPhone(phoneRaw);
-      var bad = null;
-
-      setError(form, "name", name.length < 2 ? "נא לכתוב שם מלא." : "");
-      if (name.length < 2) bad = bad || form.elements.name;
-      setError(form, "phone", !phone ? "נא לכתוב מספר טלפון ישראלי, למשל 050-1234567." : "");
-      if (!phone) bad = bad || form.elements.phone;
+      var name = form.elements.name.value.trim(), phone = israeliPhone(form.elements.phone.value.trim()), bad = null;
+      setError(form, "name", name.length < 2 ? "נא לכתוב שם מלא." : ""); if (name.length < 2) bad = bad || form.elements.name;
+      setError(form, "phone", !phone ? "נא לכתוב מספר טלפון ישראלי, למשל 050-1234567." : ""); if (!phone) bad = bad || form.elements.phone;
       if (bad) { bad.focus(); return; }
-
-      status.hidden = true;
-      button.disabled = true;
-      button.textContent = "שולחים…";
-
-      var payload = {
-        name: name,
-        phone: phone,
-        business: form.elements.business.value.trim(),
-        message: form.elements.message.value.trim(),
-        marketing_consent: !!form.elements.marketing_consent.checked,
-        website: form.elements.website.value,
-        elapsed_ms: Date.now() - started,
-        page: location.pathname
-      };
-
-      fetch(ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "apikey": ANON, "Authorization": "Bearer " + ANON },
-        body: JSON.stringify(payload)
-      })
+      status.hidden = true; button.disabled = true; button.textContent = "שולחים…";
+      var payload = { name: name, phone: phone, business: form.elements.business.value.trim(), message: form.elements.message.value.trim(),
+        marketing_consent: !!form.elements.marketing_consent.checked, website: form.elements.website.value, elapsed_ms: Date.now() - started, page: location.pathname };
+      fetch(ENDPOINT, { method: "POST", headers: { "Content-Type": "application/json", "apikey": ANON, "Authorization": "Bearer " + ANON }, body: JSON.stringify(payload) })
         .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok && j.ok, j: j }; }); })
         .then(function (res) {
-          if (res.ok) {
-            form.reset();
-            status.className = "form-status ok";
-            status.textContent = "תודה! קיבלנו את הפרטים, ונחזור אליכם בימים א׳–ה׳.";
-          } else if (res.j && res.j.error === "phone") {
-            setError(form, "phone", "נא לכתוב מספר טלפון ישראלי, למשל 050-1234567.");
-            form.elements.phone.focus();
-            return;
-          } else {
-            throw new Error("failed");
-          }
+          if (res.ok) { form.reset(); status.className = "form-status ok"; status.textContent = "תודה! קיבלנו את הפרטים, ונחזור אליכם בימים א׳–ה׳."; }
+          else if (res.j && res.j.error === "phone") { setError(form, "phone", "נא לכתוב מספר טלפון ישראלי, למשל 050-1234567."); form.elements.phone.focus(); return "skip"; }
+          else throw new Error("failed");
         })
-        .catch(function () {
-          status.className = "form-status err";
-          status.textContent = "לא הצלחנו לשלוח כרגע. אפשר להתקשר או לשלוח וואטסאפ ל-050-9257065.";
-        })
-        .then(function () {
-          status.hidden = false;
-          button.disabled = false;
-          button.textContent = "שליחה";
-          status.focus();
-        });
+        .catch(function () { status.className = "form-status err"; status.textContent = "לא הצלחנו לשלוח כרגע. אפשר להתקשר או לשלוח וואטסאפ ל-050-9257065."; })
+        .then(function (r) { button.disabled = false; button.textContent = "שליחה"; if (r === "skip") return; status.hidden = false; status.focus(); });
     });
   });
 })();

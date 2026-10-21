@@ -22,13 +22,14 @@ Pages are generated — never edit the HTML at the root by hand.
 ## Rules that keep it findable and legal
 
 - **Plain HTML only.** AI crawlers do not run JavaScript; everything a page says must be in the HTML.
-  `assets/site.js` only reorders the store buttons and sends the form.
+  `assets/site.js` adds motion on top (reveals, the scroll-driven phone, the stop button) and sends the form — the page reads completely without it.
 - **Every page opens with a direct answer** (`<p class="answer">`) — the sentence an AI would quote.
+- **Motion (v2 design):** every ambient loop must stop with the header "עצירת תנועה" button (WCAG 2.2.2) — add any new looping element to the `.motion-paused` list in `site.css`. Hidden-until-revealed states only under `html.js.motion`. The choice is kept in `localStorage` (`zw-motion`), which the privacy policy mentions.
 - **No cookies, pixels, analytics or third-party embeds.** The privacy policy says so; adding any of
   them means updating `/privacy/` first (and asking for consent for non-essential cookies).
-- **Fonts are self-hosted** (Heebo, OFL — `assets/fonts/OFL.txt`).
-- **Accessibility (ת"י 5568 / WCAG 2.1 AA):** contrast ≥4.5:1, visible focus, labelled fields, no
-  auto-moving content. Re-check with axe after any design change; update `/accessibility/` date.
+- **Fonts are self-hosted** (Heebo for reading, Karantina for display; both OFL — `assets/fonts/`). Network icons: simple-icons (CC0), `assets/img/net/`.
+- **Accessibility (ת"י 5568 / WCAG 2.1 AA):** contrast ≥4.5:1, visible focus, labelled fields, every
+  loop stoppable, `prefers-reduced-motion` respected. Re-check with axe after any design change; update `/accessibility/` date.
 - **`robots.txt` allows every crawler, including AI training bots** (Ori, 2026-10-21).
 - FAQ JSON-LD is generated from the visible `<details>` on `/faq/`, so the two never disagree.
 
