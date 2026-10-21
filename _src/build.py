@@ -278,10 +278,34 @@ def lead_form(p, fid):
 </form>'''
 
 
-MOTION_BTN = ('<button class="motion-toggle" type="button" aria-pressed="false" aria-label="עצירת תנועה ואנימציות באתר">'
-              '<svg class="pause" viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="2" width="3.5" height="12" rx="1" fill="currentColor"/><rect x="9.5" y="2" width="3.5" height="12" rx="1" fill="currentColor"/></svg>'
-              '<svg class="play" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg>'
-              '<span class="label">עצירת תנועה</span></button>')
+A11Y_ICON = ('<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="4.2" r="2.2" fill="currentColor"/>'
+             '<path d="M4.5 8.2c2.4.7 4.9 1 7.5 1s5.1-.3 7.5-1M12 9.2v5.3M12 14.5l-3.2 6.3M12 14.5l3.2 6.3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>')
+
+
+def a11y_menu(p):
+    """Our own accessibility menu — no third-party plugin. Extra help on top of a site that is accessible by itself;
+    it also holds the stop-animations control that WCAG 2.2.2 requires."""
+    opts = [
+        ("motion", "עצירת אנימציות", '<path d="M8 5v14M16 5v14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>', True),
+        ("text-up", "הגדלת טקסט", '<path d="M4 18L9 6l5 12M5.8 14h6.4M18 8v6M15 11h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>', False),
+        ("text-down", "הקטנת טקסט", '<path d="M4 18L9 6l5 12M5.8 14h6.4M15 11h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>', False),
+        ("contrast", "ניגודיות גבוהה", '<circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/>', True),
+        ("links", "הדגשת קישורים", '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>', True),
+        ("font", "גופן קריא", '<path d="M5 19L10 5h1l5 14M7 14h7M18 12v7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>', True),
+    ]
+    btns = "".join(
+        f'<button type="button" data-a11y="{k}"{" aria-pressed=\"false\"" if toggle else ""}><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">{ic}</svg><span>{label}</span></button>'
+        for k, label, ic, toggle in opts)
+    return f'''<div class="a11y">
+  <button class="a11y-btn" type="button" aria-expanded="false" aria-controls="a11y-panel" aria-label="תפריט נגישות">{A11Y_ICON}</button>
+  <div class="a11y-panel" id="a11y-panel" role="dialog" aria-modal="false" aria-labelledby="a11y-title" hidden>
+    <div class="a11y-head"><h2 id="a11y-title">תפריט נגישות</h2><button class="a11y-close" type="button" aria-label="סגירת תפריט הנגישות">✕</button></div>
+    <div class="a11y-grid">{btns}</div>
+    <button type="button" class="a11y-reset" data-a11y="reset">איפוס כל ההגדרות</button>
+    <p class="a11y-foot"><a href="{rel(p, "accessibility/")}">הצהרת נגישות</a> · <a href="{rel(p, "accessibility/")}#report">דיווח על בעיית נגישות</a></p>
+    <p class="sr-only" aria-live="polite" id="a11y-live"></p>
+  </div>
+</div>'''
 
 
 def header(p, active):
@@ -292,7 +316,7 @@ def header(p, active):
   <div class="wrap">
     {brand}
     <nav class="nav-desk" aria-label="ראשי">{nav}</nav>
-    <div class="head-actions">{MOTION_BTN}<a class="btn small nav-desk" href="{rel(p, "contact/")}">דברו איתנו</a>
+    <div class="head-actions"><a class="btn small nav-desk" href="{rel(p, "contact/")}">דברו איתנו</a>
       <details class="menu"><summary>תפריט</summary><nav aria-label="ראשי (נייד)">{nav}<a href="{rel(p, "contact/")}">דברו איתנו</a></nav></details>
     </div>
   </div>
@@ -366,10 +390,12 @@ def breadcrumbs(p, label):
     return f'<nav class="crumbs" aria-label="פירורי לחם"><ol>{items}<li aria-current="page">{label}</li></ol></nav>'
 
 
-HEAD_SCRIPT = ("<script>(function(h){h.classList.remove('no-js');h.classList.add('js');var off=false;"
-               "try{off=localStorage.getItem('zw-motion')==='off'}catch(e){}"
+HEAD_SCRIPT = ("<script>(function(h){h.classList.remove('no-js');h.classList.add('js');var off=false,a={};"
+               "try{off=localStorage.getItem('zw-motion')==='off';a=JSON.parse(localStorage.getItem('zw-a11y')||'{}')||{}}catch(e){}"
                "if(!off&&window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)off=true;"
-               "h.classList.add(off?'motion-none':'motion')})(document.documentElement)</script>")
+               "h.classList.add(off?'motion-none':'motion');"
+               "if(a.contrast)h.classList.add('a11y-contrast');if(a.links)h.classList.add('a11y-links');"
+               "if(a.font)h.classList.add('a11y-font');if(a.text)h.classList.add('a11y-text-'+a.text)})(document.documentElement)</script>")
 
 
 def render(page):
@@ -429,6 +455,7 @@ def render(page):
 </head>
 <body>
 <a class="skip" href="#main">דלגו לתוכן הראשי</a>
+{a11y_menu(p)}
 <div class="aurora" aria-hidden="true"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span></div>
 {header(p, active)}
 {top}

@@ -24,7 +24,8 @@ Pages are generated — never edit the HTML at the root by hand.
 - **Plain HTML only.** AI crawlers do not run JavaScript; everything a page says must be in the HTML.
   `assets/site.js` adds motion on top (reveals, the scroll-driven phone, the stop button) and sends the form — the page reads completely without it.
 - **Every page opens with a direct answer** (`<p class="answer">`) — the sentence an AI would quote.
-- **Motion (v2 design):** every ambient loop must stop with the header "עצירת תנועה" button (WCAG 2.2.2) — add any new looping element to the `.motion-paused` list in `site.css`. Hidden-until-revealed states only under `html.js.motion`. The choice is kept in `localStorage` (`zw-motion`), which the privacy policy mentions.
+- **Accessibility menu (side button, our own — no third-party plugin):** stop animations (this is the WCAG 2.2.2 pause mechanism — add any new looping element to the `.motion-paused` list in `site.css`), text size, high contrast, highlight links, readable font, reset, links to the statement. Choices live in `localStorage` (`zw-motion`, `zw-a11y`) and are applied by the head script before paint; the privacy policy mentions this. A widget is NOT legally required and never replaces the site being accessible itself (ISOC: icon optional; FTC fined accessiBe 2025).
+- **Motion:** hidden-until-revealed states only under `html.js.motion`.
 - **No cookies, pixels, analytics or third-party embeds.** The privacy policy says so; adding any of
   them means updating `/privacy/` first (and asking for consent for non-essential cookies).
 - **Fonts are self-hosted** (Heebo for reading, Karantina for display; both OFL — `assets/fonts/`). Network icons: simple-icons (CC0), `assets/img/net/`.

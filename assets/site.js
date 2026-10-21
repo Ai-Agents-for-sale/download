@@ -6,26 +6,58 @@
   var motionOn = function () { return html.classList.contains("motion") && !html.classList.contains("motion-paused"); };
   var svgs = function () { return document.querySelectorAll("svg.smil"); };
 
-  // ── 1. motion on/off (WCAG 2.2.2: every ambient loop can be stopped) ──
+  // ── 1. accessibility menu (our own; no third-party plugin) ──
+  // Motion on/off lives here — WCAG 2.2.2: every ambient loop can be stopped.
+  var live = document.getElementById("a11y-live");
+  var say = function (msg) { if (live) { live.textContent = ""; setTimeout(function () { live.textContent = msg; }, 60); } };
+  var store = function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} };
+  var prefs = {}; try { prefs = JSON.parse(localStorage.getItem("zw-a11y") || "{}") || {}; } catch (e) {}
+  function btn(k) { return document.querySelector("[data-a11y='" + k + "']"); }
+  function pressed(k, on) { var b = btn(k); if (b) b.setAttribute("aria-pressed", on ? "true" : "false"); }
+
   function setMotion(on, save) {
     html.classList.toggle("motion-paused", !on && html.classList.contains("motion"));
     if (on) { html.classList.remove("motion-none", "motion-paused"); html.classList.add("motion"); }
     svgs().forEach(function (s) { try { on ? s.unpauseAnimations() : s.pauseAnimations(); } catch (e) {} });
-    document.querySelectorAll(".motion-toggle").forEach(function (b) {
-      b.setAttribute("aria-pressed", on ? "false" : "true");
-      var l = b.querySelector(".label"); if (l) l.textContent = on ? "עצירת תנועה" : "הפעלת תנועה";
-      b.setAttribute("aria-label", on ? "עצירת תנועה ואנימציות באתר" : "הפעלת תנועה ואנימציות באתר");
-    });
-    if (save) { try { localStorage.setItem("zw-motion", on ? "on" : "off"); } catch (e) {} }
+    pressed("motion", !on);
+    if (save) store("zw-motion", on ? "on" : "off");
   }
   if (!html.classList.contains("motion")) {
     svgs().forEach(function (s) { try { s.pauseAnimations(); s.setCurrentTime(0); } catch (e) {} });
     setMotion(false, false);
   } else { setMotion(true, false); }
-  document.querySelectorAll(".motion-toggle").forEach(function (b) {
-    b.addEventListener("click", function () { setMotion(!motionOn(), true); });
-  });
-  if (reduce) document.querySelectorAll(".motion-toggle").forEach(function (b) { b.hidden = false; });
+
+  function applyPrefs() {
+    html.classList.toggle("a11y-contrast", !!prefs.contrast); pressed("contrast", !!prefs.contrast);
+    html.classList.toggle("a11y-links", !!prefs.links); pressed("links", !!prefs.links);
+    html.classList.toggle("a11y-font", !!prefs.font); pressed("font", !!prefs.font);
+    html.classList.remove("a11y-text-1", "a11y-text-2"); if (prefs.text) html.classList.add("a11y-text-" + prefs.text);
+    store("zw-a11y", JSON.stringify(prefs));
+  }
+  applyPrefs();
+
+  var menuBtn = document.querySelector(".a11y-btn"), panel = document.getElementById("a11y-panel");
+  function openMenu(open) {
+    if (!panel) return;
+    panel.hidden = !open; menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+    if (open) { var first = panel.querySelector("[data-a11y]"); if (first) first.focus(); } else { menuBtn.focus(); }
+  }
+  if (menuBtn && panel) {
+    menuBtn.addEventListener("click", function () { openMenu(panel.hidden); });
+    panel.querySelector(".a11y-close").addEventListener("click", function () { openMenu(false); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !panel.hidden) openMenu(false); });
+    document.addEventListener("click", function (e) { if (!panel.hidden && !e.target.closest(".a11y")) { panel.hidden = true; menuBtn.setAttribute("aria-expanded", "false"); } });
+    panel.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-a11y]"); if (!b) return;
+      var k = b.getAttribute("data-a11y");
+      if (k === "motion") { var stop = b.getAttribute("aria-pressed") !== "true"; setMotion(!stop, true); say(stop ? "האנימציות נעצרו" : "האנימציות הופעלו"); return; }
+      if (k === "text-up") { prefs.text = Math.min(2, (prefs.text || 0) + 1); applyPrefs(); say(prefs.text === 2 ? "הטקסט בגודל המקסימלי" : "הטקסט הוגדל"); return; }
+      if (k === "text-down") { prefs.text = Math.max(0, (prefs.text || 0) - 1); applyPrefs(); say(prefs.text ? "הטקסט הוקטן" : "הטקסט בגודל הרגיל"); return; }
+      if (k === "reset") { prefs = {}; applyPrefs(); setMotion(!reduce, true); try { localStorage.removeItem("zw-motion"); } catch (e2) {} say("כל ההגדרות אופסו"); return; }
+      prefs[k] = !prefs[k]; applyPrefs();
+      say(b.textContent.trim() + (prefs[k] ? " הופעל" : " כובה"));
+    });
+  }
 
   // ── 2. header glass after scrolling ──
   var header = document.querySelector(".site-header");
