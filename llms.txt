@@ -1,0 +1,22 @@
+# Zero Work AI
+
+> Zero Work AI (Hebrew: זירו וורק) is an Israeli app that runs a business's social-media content with AI, in Hebrew. It prepares a full week of content in advance (carousels, posts, stories and videos) based on the business profile, brand and competitor analysis; the business owner approves once a week from the phone, and the content is published automatically to Instagram, Facebook, TikTok, YouTube and LinkedIn. Built by Zero Work LTD (Ashdod, Israel) for small and medium Israeli businesses; more than 100 businesses use it. Not related to ZeroWork (zerowork.io), a browser-automation tool.
+
+- Available on iPhone (App Store: https://apps.apple.com/il/app/id6799529635), Android (Google Play: https://play.google.com/store/apps/details?id=com.zeroworkai.app) and as a Telegram Mini App, for businesses that joined the service.
+- Contact: +972-50-925-7065 · aiagentsforsale@gmail.com · pricing is explained on an intro call.
+
+## Pages (Hebrew)
+
+- [Home](https://app.zerowork-media.com/): what Zero Work AI is and who it is for
+- [How it works](https://app.zerowork-media.com/how-it-works/): intro call, onboarding questionnaire, connecting networks, weekly plan, approval, auto-publishing, learning from ratings
+- [Features](https://app.zerowork-media.com/features/): overview of all capabilities
+- [Weekly content](https://app.zerowork-media.com/features/weekly-content/): a week of content prepared in advance
+- [Design](https://app.zerowork-media.com/features/design/): carousels, posts, stories, testimonials and AI images in the brand's colours
+- [Video](https://app.zerowork-media.com/features/video/): raw video to edited video with Hebrew captions, b-roll and music; long YouTube video to short clips
+- [Competitor analysis](https://app.zerowork-media.com/features/competitors/): competitor and viral-pattern research feeding the weekly content
+- [Publishing](https://app.zerowork-media.com/features/publishing/): scheduling and publishing to five networks
+- [Brand](https://app.zerowork-media.com/features/brand/): how the agent learns the business and its voice
+- [Compare](https://app.zerowork-media.com/compare/): Zero Work AI vs ChatGPT + Canva, scheduling tools, writing tools and a social media manager
+- [FAQ](https://app.zerowork-media.com/faq/)
+- [About](https://app.zerowork-media.com/about/)
+- [Contact](https://app.zerowork-media.com/contact/)

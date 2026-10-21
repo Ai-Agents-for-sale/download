@@ -1,0 +1,19 @@
+# Zero Work AI · app.zerowork-media.com
+# Every crawler may read the whole site, including AI search and AI training crawlers
+# (decision: Ori, 2026-10-21). Only the page sources in /_src/ are kept out.
+User-agent: *
+User-agent: OAI-SearchBot
+User-agent: GPTBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-SearchBot
+User-agent: Claude-User
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: Google-Extended
+User-agent: Googlebot
+User-agent: Bingbot
+Allow: /
+Disallow: /_src/
+
+Sitemap: https://app.zerowork-media.com/sitemap.xml
