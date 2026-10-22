@@ -176,7 +176,7 @@ h2.title { font-family: var(--display); font-weight: 700; font-size: clamp(2.9re
 .day i { font-style: normal; font-weight: 800; width: 7cqw; color: #4A5680; }
 .chip { font-size: 3.2cqw; font-weight: 700; padding: 1cqw 2.6cqw; border-radius: 99px; color: #0F1B4C; }
 .chip.k { background: #E3EDFF; } .chip.s { background: #EFE7FF; } .chip.p { background: #DCF4F9; } .chip.v { background: #E0F7EC; }
-.phone[data-step="1"] .s1 .chip { animation: pop .5s var(--ease) both; animation-delay: calc(var(--i) * 110ms + 200ms); }
+.js.motion .phone[data-step="1"] .s1 .chip { animation: pop .5s var(--ease) both; animation-delay: calc(var(--i) * 110ms + 200ms); }
 @keyframes pop { from { opacity: 0; transform: scale(.6); } }
 .gen { margin-top: auto; display: flex; align-items: center; gap: 2cqw; font-size: 3.4cqw; color: #4A5680; font-weight: 600; }
 .gen::before { content: ""; width: 3cqw; height: 3cqw; border-radius: 50%; background: #2F6BFF; box-shadow: 0 0 0 1.6cqw rgba(47,107,255,.18); }
@@ -189,10 +189,10 @@ h2.title { font-family: var(--display); font-weight: 700; font-size: clamp(2.9re
 .approve { display: flex; gap: 2cqw; }
 .approve span { flex: 1; text-align: center; padding: 2.6cqw; border-radius: 99px; font-weight: 800; font-size: 3.6cqw; background: #E3EDFF; color: #14246B; }
 .approve .yes { background: #2F6BFF; color: #FFFFFF; }
-.phone[data-step="2"] .yes { animation: press 2.4s ease both .6s; }
+.js.motion .phone[data-step="2"] .yes { animation: press 2.4s ease both .6s; }
 @keyframes press { 0%, 40% { transform: none; background: #2F6BFF; } 46% { transform: scale(.94); } 55%, 100% { transform: none; background: #1AA251; } }
 .toast { background: #0F1B4C; color: #FFFFFF; font-size: 3.3cqw; font-weight: 600; padding: 2.6cqw 3.6cqw; border-radius: 3cqw; opacity: 0; }
-.phone[data-step="2"] .toast { animation: toast .5s var(--ease) both 1.9s; }
+.js.motion .phone[data-step="2"] .toast { animation: toast .5s var(--ease) both 1.9s; }
 .no-js .toast { opacity: 1; }
 @keyframes toast { from { opacity: 0; transform: translateY(30%); } to { opacity: 1; transform: none; } }
 .post { display: flex; align-items: center; gap: 2.6cqw; background: #FFFFFF; border-radius: 3.6cqw; padding: 2.6cqw 3cqw; box-shadow: 0 1px 0 #E3E9F7; }
@@ -203,7 +203,7 @@ h2.title { font-family: var(--display); font-weight: 700; font-size: clamp(2.9re
 .post .meta span { display: flex; gap: 1.2cqw; margin-top: .8cqw; }
 .post .meta span svg { width: 3.8cqw; height: 3.8cqw; }
 .done { font-size: 3cqw; font-weight: 800; color: #11733A; background: #DDF6E9; border-radius: 99px; padding: 1cqw 2.4cqw; }
-.phone[data-step="3"] .done { animation: pop .45s var(--ease) both; animation-delay: calc(var(--i) * 420ms + 300ms); }
+.js.motion .phone[data-step="3"] .done { animation: pop .45s var(--ease) both; animation-delay: calc(var(--i) * 420ms + 300ms); }
 
 /* ── bento features ── */
 .bento { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; list-style: none; margin: 0; padding: 0; }

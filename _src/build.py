@@ -50,7 +50,7 @@ PAGES = [
     ("features/competitors/", "competitors", "ניתוח מתחרים ודפוסים ויראליים · Zero Work AI", "ניתוח מתחרים",
      "Zero Work AI סורקת את המתחרים של העסק ואת התוכן שעובד בתחום, בארץ ובעולם, ומשתמשת בממצאים כדי לבחור נושאים ופתיחים לתוכן השבועי.",
      "הסוכן בודק מה עובד אצל אחרים בתחום שלכם, ומכניס את מה שלמד ישר לתוכן של השבוע.", "מתחרים", "radar"),
-    ("features/publishing/", "publishing", "פרסום ותזמון לאינסטגרם, פייסבוק, טיקטוק, יוטיוב ולינקדאין · Zero Work AI", "פרסום לכל הרשתות",
+    ("features/publishing/", "publishing", "פרסום ותזמון לכל הרשתות · Zero Work AI", "פרסום לכל הרשתות",
      "Zero Work AI מפרסמת ומתזמנת תוכן לאינסטגרם, פייסבוק, טיקטוק, יוטיוב ולינקדאין, כולל תוכן שיצרתם בעצמכם. באפליקציה רואים מה מחכה לאישור, מה מתוזמן ומה פורסם.",
      "תוכן שאושר עולה לבד בזמן שנקבע, לכל הרשתות שחיברתם. אתם רק רואים שזה קרה.", "פרסום", "send"),
     ("features/brand/", "brand", "המותג והקול של העסק · Zero Work AI", "המותג והקול שלכם",
@@ -71,7 +71,7 @@ PAGES = [
     ("privacy/", "privacy", "מדיניות פרטיות לאתר · Zero Work AI", "מדיניות פרטיות",
      "מדיניות הפרטיות של אתר Zero Work AI: איזה מידע נאסף בטופס יצירת הקשר, למה, איפה הוא נשמר ומה הזכויות שלכם. האתר אינו משתמש בעוגיות.",
      None, "מדיניות פרטיות", None),
-    ("terms/", "terms", "תנאי שימוש באתר · Zero Work AI", "תנאי שימוש באתר", "תנאי השימוש באתר Zero Work AI.", None, "תנאי שימוש", None),
+    ("terms/", "terms", "תנאי שימוש באתר · Zero Work AI", "תנאי שימוש באתר", "תנאי השימוש באתר Zero Work AI: למה נועד המידע באתר, קישורים לחנויות, קניין רוחני, אחריות, והקשר לתנאי השירות של האפליקציה.", None, "תנאי שימוש", None),
     ("accessibility/", "accessibility", "הצהרת נגישות · Zero Work AI", "הצהרת נגישות",
      "הצהרת הנגישות של אתר Zero Work AI: רמת הנגישות, מה הונגש, מגבלות ידועות ודרכים לפנות אלינו בנושא נגישות.",
      None, "הצהרת נגישות", None),
@@ -380,6 +380,15 @@ def faq_jsonld(body):
             "mainEntity": [{"@type": "Question", "name": strip(q), "acceptedAnswer": {"@type": "Answer", "text": strip(a)}} for q, a in qa]}
 
 
+def breadcrumb_jsonld(p, label):
+    items = [("", "ראשי")]
+    if p.startswith("features/") and p != "features/":
+        items.append(("features/", "יכולות"))
+    items.append((p, label))
+    return {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
+        {"@type": "ListItem", "position": i + 1, "name": n, "item": SITE + "/" + h} for i, (h, n) in enumerate(items)]}
+
+
 def breadcrumbs(p, label):
     if p == "":
         return ""
@@ -413,7 +422,7 @@ def render(page):
     assert "{{" not in body, f"unresolved var in {slug}"
 
     url = SITE + "/" + p
-    ld = [org_jsonld()] if slug == "home" else []
+    ld = [org_jsonld()] if slug == "home" else [breadcrumb_jsonld(p, crumb)]
     if slug == "faq":
         ld.append(faq_jsonld(body))
     ld_html = "".join(f'<script type="application/ld+json">{json.dumps(x, ensure_ascii=False)}</script>' for x in ld)

@@ -84,6 +84,8 @@
       });
     }, { threshold: 0.14, rootMargin: "0px 0px -6% 0px" });
     document.querySelectorAll(".rv").forEach(function (el) { io.observe(el); });
+    // Safety net: whatever the observer missed (very tall viewports, crawlers that render) shows after 3s.
+    setTimeout(revealAll, 3000);
 
     // ── 4. the phone follows the step in the middle of the screen ──
     var phone = document.querySelector(".story .phone");
