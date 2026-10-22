@@ -63,7 +63,7 @@ PAGES = [
      "תשובות לשאלות הנפוצות על Zero Work AI: למי זה מתאים, אילו רשתות, האם התוכן בעברית, האם משהו מתפרסם בלי אישור, איך מתחילים ועוד.",
      "התשובות הקצרות לשאלות שאנחנו שומעים הכי הרבה.", "שאלות נפוצות", None),
     ("about/", "about", "אודות Zero Work AI (זירו וורק)", "אודות Zero Work AI",
-     "Zero Work AI (זירו וורק) היא אפליקציה של חברת Zero Work LTD מאשדוד, שבונה סוכן תוכן בעברית לעסקים ישראליים. יותר מ-100 עסקים עובדים איתה היום.",
+     "Zero Work AI (זירו וורק) היא אפליקציה של חברת Zero Work LTD, שבונה סוכן תוכן בעברית לעסקים ישראליים. יותר מ-100 עסקים עובדים איתה היום.",
      "חברה ישראלית שבונה סוכן תוכן בעברית לעסקים קטנים ובינוניים.", "אודות", None),
     ("contact/", "contact", "צרו קשר · Zero Work AI", "דברו איתנו",
      "רוצים לשמוע איך Zero Work AI יכולה לנהל את התוכן של העסק שלכם? השאירו פרטים ונחזור אליכם, או התקשרו ל-050-9257065.",
@@ -272,7 +272,7 @@ def lead_form(p, fid):
     <input id="{fid}-consent" name="marketing_consent" type="checkbox">
     <span>אני מסכים/ה לקבל מ-{COMPANY} דברי פרסומת ועדכונים בוואטסאפ, ב-SMS ובדוא"ל. אפשר לבטל בכל עת בהשבת "הסר" או בפנייה ל-{EMAIL}. (לא חובה, ולא נדרש כדי שנחזור אליכם.)</span>
   </label>
-  <p class="form-notice" id="{fid}-notice">שדות המסומנים ב-<span aria-hidden="true">*</span><span class="sr-only">כוכבית</span> הם חובה למשלוח הטופס. מסירת הפרטים אינה חובה לפי חוק והיא תלויה ברצונכם, אבל בלי שם וטלפון לא נוכל לחזור אליכם. בלחיצה על "שליחה" אתם מבקשים שנחזור אליכם בטלפון או בוואטסאפ בעניין הפנייה. האחראית על המידע: {COMPANY}, ח.פ. {COMPANY_ID}, {ADDRESS}, טלפון {PHONE}, {EMAIL}. הפרטים ישמשו למענה לפנייה ולהצגת השירות. הם עוברים דרך שרתי Supabase (באוסטרליה) ונשמרים במערכת ניהול הלקוחות Monday.com (שרתים מחוץ לישראל), ולא יימסרו לאף גורם אחר לצורכי שיווק. אתם זכאים לעיין במידע עליכם ולבקש לתקן או למחוק אותו, בפנייה לטלפון או לדוא"ל שלמעלה. פירוט מלא ב<a href="{rel(p, "privacy/")}">מדיניות הפרטיות</a>.</p>
+  <p class="form-notice" id="{fid}-notice">שדות המסומנים ב-<span aria-hidden="true">*</span><span class="sr-only">כוכבית</span> הם חובה למשלוח הטופס. מסירת הפרטים אינה חובה לפי חוק והיא תלויה ברצונכם, אבל בלי שם וטלפון לא נוכל לחזור אליכם. בלחיצה על "שליחה" אתם מבקשים שנחזור אליכם בטלפון או בוואטסאפ בעניין הפנייה. האחראית על המידע: {COMPANY}, טלפון {PHONE}, {EMAIL}. הפרטים ישמשו למענה לפנייה ולהצגת השירות. הם עוברים דרך שרתי Supabase (באוסטרליה) ונשמרים במערכת ניהול הלקוחות Monday.com (שרתים מחוץ לישראל), ולא יימסרו לאף גורם אחר לצורכי שיווק. אתם זכאים לעיין במידע עליכם ולבקש לתקן או למחוק אותו, בפנייה לטלפון או לדוא"ל שלמעלה. פירוט מלא ב<a href="{rel(p, "privacy/")}">מדיניות הפרטיות</a>.</p>
   <button class="btn" type="submit">שליחה</button>
   <p class="form-status" role="status" tabindex="-1" hidden></p>
 </form>'''
@@ -350,7 +350,7 @@ def footer(p):
       </ul></div>
     </div>
     <div class="foot-legal">
-      <span>© {date.today().year} {COMPANY} · ח.פ. {COMPANY_ID} · {ADDRESS}</span>
+      <span>© {date.today().year} {COMPANY}</span>
       <span>טלפון <a href="tel:+972509257065" dir="ltr">{PHONE}</a> · <a href="mailto:{EMAIL}">{EMAIL}</a></span>
       <span>App Store הוא סימן מסחר של Apple Inc. ‏Google Play והלוגו של Google Play הם סימני מסחר של Google LLC.</span>
     </div>
@@ -362,7 +362,6 @@ def org_jsonld():
     return {"@context": "https://schema.org", "@graph": [
         {"@type": "Organization", "@id": SITE + "/#org", "name": "Zero Work AI", "alternateName": ["זירו וורק", "Zero Work"], "legalName": COMPANY,
          "url": SITE + "/", "logo": SITE + "/icon-192.png", "telephone": "+972-50-925-7065", "email": EMAIL,
-         "address": {"@type": "PostalAddress", "streetAddress": "שדרות ירושלים 18", "addressLocality": "אשדוד", "addressCountry": "IL"},
          "areaServed": "IL", "sameAs": [IOS, ANDROID]},
         {"@type": "MobileApplication", "@id": SITE + "/#app", "name": "Zero Work AI", "operatingSystem": "iOS, Android",
          "applicationCategory": "BusinessApplication", "inLanguage": "he",
