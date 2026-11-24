@@ -19,6 +19,9 @@ Pages are generated — never edit the HTML at the root by hand.
 
 `python3 _src/build.py --preview --out <dir>` builds a copy whose links end in `index.html`, for previewing from files.
 
+⚠️ The build stamps TODAY on every "עדכון אחרון" line (privacy, terms, accessibility) and on every sitemap `lastmod`.
+Before committing, `git checkout --` the legal pages you did not change, so a document never shows a new date without a new text.
+
 ## Rules that keep it findable and legal
 
 - **Plain HTML only.** AI crawlers do not run JavaScript; everything a page says must be in the HTML.
